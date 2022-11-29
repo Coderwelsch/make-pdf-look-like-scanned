@@ -75,19 +75,6 @@
 					<key>promptMessage</key>
 					<string>Choose a PDF:</string>
 				</dict>
-				<key>ActionRuntimeParameters</key>
-				<dict>
-					<key>defaultLocation</key>
-					<string>/Users/privat/Desktop</string>
-					<key>granularity</key>
-					<integer>0</integer>
-					<key>multipleSelection</key>
-					<true/>
-					<key>promptMessage</key>
-					<string>Choose a PDF:</string>
-					<key>temporary items path</key>
-					<string>/var/folders/fk/4snt6f9d6333ncn6c14xg6pm0000gp/T/C35EA1F9-A6B4-4CAB-B704-FADF9F986720/1/com.apple.Automator.AskForFinderItems</string>
-				</dict>
 				<key>BundleIdentifier</key>
 				<string>com.apple.Automator.AskForFinderItems</string>
 				<key>CFBundleVersion</key>
@@ -180,7 +167,7 @@
 				<key>isViewVisible</key>
 				<integer>1</integer>
 				<key>location</key>
-				<string>294.250000:153.000000</string>
+				<string>293.750000:153.000000</string>
 				<key>nibPath</key>
 				<string>/System/Library/Automator/Ask for Finder Items.action/Contents/Resources/Base.lproj/main.nib</string>
 			</dict>
@@ -240,6 +227,7 @@
 
 set -e
 export PATH=/usr/local/bin:$PATH
+export PATH=/opt/homebrew/bin:$PATH
 
 for file in "$@"; do
   base=${file%.pdf}
@@ -247,7 +235,7 @@ for file in "$@"; do
 
   # Split PDF into pages
   echo "Splitting $base into separate pages"
-  /opt/homebrew/bin/pdfseparate "$file" /tmp/fake-scan-split-%04d.pdf
+  pdfseparate "$file" /tmp/fake-scan-split-%04d.pdf
 
   # Loop over the pages
   for splitFile in /tmp/fake-scan-split-*.pdf; do
@@ -255,12 +243,12 @@ for file in "$@"; do
     splitFileScanned=$splitFileBase"_scanned.pdf"
 
     # Slightly rotate page, add a bit of noise and output a flat pdf
-    /opt/homebrew/bin/convert -density 130 -trim -flatten "$splitFile" -attenuate 0.2 +noise Gaussian -rotate "$([ $((RANDOM % 2)) -eq 1 ] &amp;&amp; echo -)0.$(($RANDOM % 8 + 1))" \( +clone -background black -shadow 30x5+5+5 \) +swap -background white -layers merge +repage "$splitFileScanned"
+    convert -density 130 -trim -flatten "$splitFile" -attenuate 0.2 +noise Gaussian -rotate "$([ $((RANDOM % 2)) -eq 1 ] &amp;&amp; echo -)0.$(($RANDOM % 8 + 1))" \( +clone -background black -shadow 30x5+5+5 \) +swap -background white -layers merge +repage "$splitFileScanned"
     echo "Output page $splitFileBase to $splitFileScanned"
   done
 
   # Combine the PDFs, add noise across the entire document, apply sharpening, convert to b&amp;w, soften the blacks slightly
-  /opt/homebrew/bin/convert -density 130 $(ls -rt /tmp/fake-scan-split-*_scanned.pdf) -attenuate 0.2 +noise Multiplicative -sharpen 0x1.0 -colorspace Gray +level 15%,100% "$base"
+  convert -density 130 $(ls -rt /tmp/fake-scan-split-*_scanned.pdf) -attenuate 0.2 +noise Multiplicative -sharpen 0x1.0 -colorspace Gray +level 15%,100% "$base"
   echo "PDF re-combined to $base"
 
   # Remove all the temporary PDFs
@@ -380,7 +368,7 @@ done
 				<key>isViewVisible</key>
 				<integer>1</integer>
 				<key>location</key>
-				<string>294.250000:639.000000</string>
+				<string>293.750000:335.000000</string>
 				<key>nibPath</key>
 				<string>/System/Library/Automator/Run Shell Script.action/Contents/Resources/Base.lproj/main.nib</string>
 			</dict>
@@ -390,7 +378,7 @@ done
 	</array>
 	<key>connectors</key>
 	<dict>
-		<key>7C08B24D-1218-4FDB-8448-A534A6A0881C</key>
+		<key>A4591F3D-9C3A-455B-83C0-5E42C79DF48C</key>
 		<dict>
 			<key>from</key>
 			<string>0DEABB9E-7A4A-425F-B4C1-B740CD2DA8B5 - 0DEABB9E-7A4A-425F-B4C1-B740CD2DA8B5</string>
